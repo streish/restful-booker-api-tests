@@ -10,28 +10,45 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
+import java.util.Map;
+
+import static com.hotelbooking.api.utils.PropertyLoaderUtils.loadProperty;
+import static org.hamcrest.Matchers.notNullValue;
+
 
 public class BookingClient {
 
-    private static final String BASE_URL = "https://restful-booker.herokuapp.com";
+    private static String BASE_URL;
 
     private final RequestSpecification requestSpec;
-    private String mediaType;
 
 
     public BookingClient() {
-            requestSpec = new RequestSpecBuilder()
-            .setBaseUri(BASE_URL)
-            .log(LogDetail.URI)
-            .log(LogDetail.BODY)
-            .build();
+        loadBaseUrl();
+
+        requestSpec = new RequestSpecBuilder()
+                .setBaseUri(BASE_URL)
+                .log(LogDetail.URI)
+                .log(LogDetail.METHOD)
+                .log(LogDetail.BODY)
+                .build();
     }
 
-    public static Auth authenticateUser(Auth auth) {
+    private static void loadBaseUrl() {
+        // read base URL from resources
+        BASE_URL = loadProperty("booker.host");
+    }
+
+    public Auth authenticateUser(Auth auth) {
         Response response = RestAssured.given()
                 .contentType(ContentType.JSON)
                 .body(auth)
-                .post(BASE_URL + "/auth");
+                .post(BASE_URL + "/auth")
+                .then()
+                .assertThat()
+                .body("token", notNullValue())
+                .extract()
+                .response();
         return response.as(Auth.class);
     }
 
@@ -61,7 +78,25 @@ public class BookingClient {
         return response.as(Booking.class);
     }
 
-    public Response partialUpdateBooking(Booking booking, int id, String token, String mediaType) {
+    public Response getBookingIds(Map<String, Object> filters) {
+        RequestSpecification request = RestAssured.given()
+                .spec(requestSpec)
+                .accept("application/json");
+        // collect filters and their values
+        for (Map.Entry<String, Object> entry : filters.entrySet()) {
+            request.queryParam(entry.getKey(), entry.getValue());
+        }
+        Response response = request.get(BASE_URL + "/booking")
+                .then()
+                //.log().body() // too many logs so probably need it only for debug
+                .log().status()
+                .extract()
+                .response();
+
+        return response;
+    }
+
+    private Response partialUpdateBooking(Booking booking, int id, String token, String mediaType) {
         ContentType contentType = mediaType.contains("json") ? ContentType.JSON : ContentType.XML;
 
         return RestAssured.given()
@@ -73,8 +108,6 @@ public class BookingClient {
                 .when()
                 .patch(BASE_URL + "/booking/" + id)
                 .then()
-                .assertThat()
-                .contentType(contentType)// assert expected content type
                 .log().all()
                 .extract()
                 .response();
@@ -91,7 +124,7 @@ public class BookingClient {
     public Response deleteBooking(int id, String token) {
         return RestAssured.given()
                 .spec(requestSpec)
-                .header("Authorization", token)
+                .header("Cookie", "token=" + token)
                 .delete(BASE_URL + "/booking/" + id)
                 .then()
                 .log().body().log().status()
@@ -100,6 +133,8 @@ public class BookingClient {
     }
 
     public static void ping() {
+        if (BASE_URL == null) loadBaseUrl();
+
         RestAssured.given()
                 .get(BASE_URL + "/ping")
                 .then()

@@ -10,6 +10,9 @@ import org.junit.jupiter.api.BeforeEach;
 
 import java.time.LocalDate;
 
+import static com.hotelbooking.api.utils.DateUtils.bookingDateFormat;
+import static com.hotelbooking.api.utils.PropertyLoaderUtils.loadProperty;
+
 
 public class BaseTest {
     protected BookingClient client;
@@ -21,29 +24,36 @@ public class BaseTest {
     }
 
     @BeforeEach
-    public void setup() {
-        Auth admin = new Auth("admin", "password123", null);
-        token = BookingClient.authenticateUser(admin).getToken();
+    public void setupClient() {
         client = new BookingClient();
+        // Authorization by admin
+        String admin = loadProperty("admin.user");
+        String password = loadProperty("admin.password");
+        Auth session = new Auth(admin, password, null);
+        token = client.authenticateUser(session).getToken();
     }
 
     public CreatedBooking createBooking() {
+        Booking booking = generateBooking();
+
+        CreatedBooking createdBooking = client.createBooking(booking, token);
+        return createdBooking;
+    }
+
+    public Booking generateBooking() {
         Booking.BookingDates bookingDate = Booking.BookingDates.builder()
-                .checkin(Booking.BookingDates.dateTimeFormatter.format(LocalDate.now()))
-                .checkout(Booking.BookingDates.dateTimeFormatter.format(LocalDate.now().plusDays(1)))
+                .checkin(bookingDateFormat().format(LocalDate.now()))
+                .checkout(bookingDateFormat().format(LocalDate.now().plusDays(1)))
                 .build();
 
         Faker faker =  new Faker();
-        Booking booking = Booking.builder()
+        return Booking.builder()
                 .firstname(faker.name().firstName())
                 .lastname(faker.name().lastName())
-                .totalprice(faker.number().numberBetween(100, 500))
+                .totalprice(faker.number().numberBetween(1, 1000))
                 .depositpaid(true)
                 .bookingdates(bookingDate)
                 .additionalneeds("Breakfast")
                 .build();
-
-        CreatedBooking createdBooking = client.createBooking(booking, token);
-        return createdBooking;
     }
 }
