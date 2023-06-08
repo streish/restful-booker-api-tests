@@ -5,6 +5,7 @@ import com.hotelbooking.api.client.BookingClient;
 import com.hotelbooking.api.model.Auth;
 import com.hotelbooking.api.model.Booking;
 import com.hotelbooking.api.model.CreatedBooking;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -14,9 +15,10 @@ import static com.hotelbooking.api.utils.DateUtils.bookingDateFormat;
 import static com.hotelbooking.api.utils.PropertyLoaderUtils.loadProperty;
 
 
-public class BaseTest {
+public abstract class BaseTest {
     protected BookingClient client;
     protected String token;
+    protected CreatedBooking createdBooking;
 
     @BeforeAll
     public static void pingClient() {
@@ -31,6 +33,19 @@ public class BaseTest {
         String password = loadProperty("admin.password");
         Auth session = new Auth(admin, password, null);
         token = client.authenticateUser(session).getToken();
+    }
+
+    @BeforeEach
+    public void setupData() {
+        // create a new booking
+        createdBooking = createBooking();
+    }
+
+    @AfterEach
+    void cleanup() {
+        if (createdBooking != null) {
+            client.deleteBooking(createdBooking.getBookingid(), token);
+        }
     }
 
     public CreatedBooking createBooking() {
@@ -56,4 +71,5 @@ public class BaseTest {
                 .additionalneeds("Breakfast")
                 .build();
     }
+
 }

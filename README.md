@@ -1,6 +1,6 @@
 # API tests restful-booker-api-tests
 
-This is a test project that uses JUnit, Maven, and Docker to run automated API tests for a REST client. The tests are performed against the [Restful Booker API](http://restful-booker.herokuapp.com).
+This is a test project that uses JUnit, Maven, and Docker to run automated API tests for a REST client. The tests are performed against the [Restful Booker API](http://restful-booker.herokuapp.com/apidoc/index.html).
 
 ## Technologies Used
 

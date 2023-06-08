@@ -4,8 +4,6 @@ import com.hotelbooking.api.BaseTest;
 import com.hotelbooking.api.model.Booking;
 import com.hotelbooking.api.model.CreatedBooking;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -19,27 +17,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class GetBookingIdsTest extends BaseTest {
 
-    private CreatedBooking createdBooking;
-
-    @BeforeEach
-    public void setupData() {
-        // create a new booking
-        createdBooking = createBooking();
-    }
-
-    @AfterEach
-    void cleanup() {
-        if (createdBooking != null) {
-            client.deleteBooking(createdBooking.getBookingid(), token);
-        }
-    }
-
     @Test
     void testGetBookingIdsWithoutFilter() {
         // Positive scenario: without filters
         Response response = client.getBookingIds(new HashMap<>());
         response.then().statusCode(200);
-
+        // Assert that bookings isn't empty
         CreatedBooking[] bookings = response.as(CreatedBooking[].class);
         assertNotNull(bookings);
         // Additional assertions based on the expected response
@@ -60,7 +43,7 @@ public class GetBookingIdsTest extends BaseTest {
 
         Response response = client.getBookingIds(filters);
         response.then().statusCode(200);
-
+        // Assert that bookings isn't empty
         CreatedBooking[] bookings = response.as(CreatedBooking[].class);
         assertNotNull(bookings);
         // Assuming the response contains only our booking
@@ -77,10 +60,10 @@ public class GetBookingIdsTest extends BaseTest {
     void testGetBookingIdsWithInvalidFilter() {
         // Negative scenario: with filters
         // Get all bookings without filters
-        CreatedBooking[] bookingsExpedted = client
+        CreatedBooking[] bookingsExpected = client
                 .getBookingIds(new HashMap<>())
                 .as(CreatedBooking[].class);
-        int expectedSize = bookingsExpedted.length;
+        int expectedSize = bookingsExpected.length;
 
         // Create unknown filter
         Map<String, Object> filters = new HashMap<>();
@@ -88,7 +71,7 @@ public class GetBookingIdsTest extends BaseTest {
 
         Response response = client.getBookingIds(filters);
         response.then().statusCode(200);
-
+        // Assert that bookings isn't empty
         CreatedBooking[] bookings = response.as(CreatedBooking[].class);
         assertNotNull(bookings);
 

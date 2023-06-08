@@ -5,8 +5,6 @@ import com.hotelbooking.api.model.Booking;
 import com.hotelbooking.api.model.CreatedBooking;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,22 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PartialUpdateBookingTest extends BaseTest {
-
-    private CreatedBooking createdBooking;
-    private static LocalDate now = LocalDate.now();
-
-    @BeforeEach
-    public void setupData() {
-        // create a new booking
-        createdBooking = createBooking();
-    }
-
-    @AfterEach
-    void cleanup() {
-        if (createdBooking != null) {
-            client.deleteBooking(createdBooking.getBookingid(), token);
-        }
-    }
+    private static final LocalDate NOW = LocalDate.now();
 
     @ParameterizedTest
     @MethodSource("generateSuccessData")
@@ -142,11 +125,11 @@ public class PartialUpdateBookingTest extends BaseTest {
         return Stream.of(
                 // Positive testing
                 bookingDate.toBuilder(), // checkIn date = checkOut date
-                bookingDate.toBuilder().checkin(formatter.format(now.minusMonths(1))),  // checkIn date is one month ago
-                bookingDate.toBuilder().checkin(formatter.format(now.minusYears(1))),  // checkIn date is one year ago
+                bookingDate.toBuilder().checkin(formatter.format(NOW.minusMonths(1))),  // checkIn date is one month ago
+                bookingDate.toBuilder().checkin(formatter.format(NOW.minusYears(1))),  // checkIn date is one year ago
 
-                bookingDate.toBuilder().checkout(formatter.format(now.plusMonths(1))),  // checkOut date is one month after
-                bookingDate.toBuilder().checkout(formatter.format(now.plusYears(1))),  // checkOut date is one year after
+                bookingDate.toBuilder().checkout(formatter.format(NOW.plusMonths(1))),  // checkOut date is one month after
+                bookingDate.toBuilder().checkout(formatter.format(NOW.plusYears(1))),  // checkOut date is one year after
 
                 // Negative testing.
                 // For me, it should be rejected, but the server successfully updates it and save 0NaN-aN-aN.
@@ -167,8 +150,8 @@ public class PartialUpdateBookingTest extends BaseTest {
         // Perform partial update
         Booking updatedBooking = new Booking();
         Booking.BookingDates bookingDate = Booking.BookingDates.builder()
-                .checkin(bookingDateFormat().format(now.plusMonths(1)))
-                .checkout(bookingDateFormat().format(now.plusMonths(2)))
+                .checkin(bookingDateFormat().format(NOW.plusMonths(1)))
+                .checkout(bookingDateFormat().format(NOW.plusMonths(2)))
                 .build();
 
         updatedBooking.setFirstname("Updated");
