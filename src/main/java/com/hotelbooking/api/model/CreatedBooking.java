@@ -12,9 +12,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CreatedBooking {
-
+    //ID for newly created booking
     private int bookingid;
 
+    // Object that contains Booking model
     private Booking booking;
 
 }

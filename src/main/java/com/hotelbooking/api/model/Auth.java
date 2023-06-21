@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Auth {
+    // Admin credentials
     private String username;
     private String password;
     private String token;
