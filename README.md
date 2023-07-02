@@ -41,17 +41,12 @@ To build the project and run tests in Docker, follow these steps:
 
    ```bash
    docker build -t booker-junit-tests .
+5. Run the following command to run tests inside the Docker container:
+
+   ```bash
+    docker run -it booker-junit-tests mvn test
 
 ## Reports
-- 1st Option. Download report from container:
+- In case you need a report from the Docker, you could run the tests with shared volume for the reports and your local directory:
    ```bash
-   docker cp <container_id>:/app/target/surefire-reports/reports ./target/surefire-reports/reports
-   
-- 2nd Option. After running the tests using the Docker image, run docker image and inside the container you can run tests again and share reports to your local directory:
-   ```bash
-   docker run -v {$pwd}/target/surefire-reports/:/app/target/surefire-reports/ -it booker-junit-tests /bin/bash
-
-
-
-   
- 
+   docker run -v {$pwd}/target/surefire-reports/:/app/target/surefire-reports/ -it booker-junit-tests /bin/bash mvn test

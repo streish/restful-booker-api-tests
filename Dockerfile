@@ -5,5 +5,5 @@ WORKDIR /app
 # Copy the project files
 COPY . .
 
-# Build the project, run tests, and generate Surefire reports
-RUN mvn clean verify
+# Build the project
+RUN mvn clean install -DskipTests
