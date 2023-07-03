@@ -207,7 +207,7 @@ public class PartialUpdateBookingTest extends BaseTest {
                 .partialUpdateBookingXml(updatedBooking, createdBooking.getBookingid(), token)
                 .then()
                 .assertThat()
-                .contentType(ContentType.XML)// assert expected content type;
+                .contentType(ContentType.XML) // assert expected content type;
                 .statusCode(200)
                 .extract().response();
 

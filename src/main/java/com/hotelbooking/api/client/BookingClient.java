@@ -41,9 +41,10 @@ public class BookingClient {
 
     public Auth authenticateUser(Auth auth) {
         Response response = RestAssured.given()
+                .spec(requestSpec)
                 .contentType(ContentType.JSON)
                 .body(auth)
-                .post(BASE_URL + "/auth")
+                .post("/auth")
                 .then()
                 .assertThat()
                 .body("token", notNullValue())
@@ -58,7 +59,7 @@ public class BookingClient {
                 .header("Authorization", token)
                 .contentType(ContentType.JSON)
                 .body(booking)
-                .post(BASE_URL + "/booking")
+                .post("/booking")
                 .then()
                 .log().body().log().status()
                 .extract()
@@ -70,7 +71,7 @@ public class BookingClient {
         Response response = RestAssured.given()
                 .spec(requestSpec)
                 .accept("application/json")
-                .get(BASE_URL + "/booking/" + id)
+                .get("/booking/" + id)
                 .then()
                 .log().body().log().status()
                 .extract()
@@ -86,13 +87,13 @@ public class BookingClient {
         for (Map.Entry<String, Object> entry : filters.entrySet()) {
             request.queryParam(entry.getKey(), entry.getValue());
         }
-        Response response = request.get(BASE_URL + "/booking")
+        Response response = request.get("/booking")
                 .then()
                 //.log().body() // too many logs so probably need it only for debug
                 .log().status()
                 .extract()
                 .response();
-
+        // here we can also measure a time for the response, such as response.time() for testing purposes.
         return response;
     }
 
@@ -106,7 +107,7 @@ public class BookingClient {
                 .accept(mediaType)// set expected content type for response body
                 .body(booking)
                 .when()
-                .patch(BASE_URL + "/booking/" + id)
+                .patch("/booking/" + id)
                 .then()
                 .log().all()
                 .extract()
@@ -125,7 +126,7 @@ public class BookingClient {
         return RestAssured.given()
                 .spec(requestSpec)
                 .header("Cookie", "token=" + token)
-                .delete(BASE_URL + "/booking/" + id)
+                .delete("/booking/" + id)
                 .then()
                 .log().body().log().status()
                 .extract()
