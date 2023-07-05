@@ -139,7 +139,7 @@ public class PartialUpdateBookingTest extends BaseTest {
                 bookingDate.toBuilder().checkout(""),  // empty checkOut date
                 bookingDate.toBuilder().checkin("2018/01/01T12:12:12"),  // wrong format for checkIn date
                 bookingDate.toBuilder().checkout("2018/01/01T12:12:12"),  // wrong format for checkOut date
-                bookingDate.toBuilder().checkout(YESTERDAY)  // checkOut date is early than checkIn
+                bookingDate.toBuilder().checkout(YESTERDAY)  // checkOut date is earlier than checkIn
                 // ... there are could be a lot of cases depends on requirements
 
         );
