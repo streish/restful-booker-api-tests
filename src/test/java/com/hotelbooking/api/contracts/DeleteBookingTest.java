@@ -20,6 +20,7 @@ public class DeleteBookingTest extends BaseTest {
 
     @Test
     void testDeleteBooking_NotExist() {
+        // The server response code is 405, but in this case it's better to return 404.
         assertMethodNotAllowed(client.deleteBooking(-1, token));
     }
 

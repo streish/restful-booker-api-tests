@@ -223,6 +223,7 @@ public class PartialUpdateBookingTest extends BaseTest {
         Booking updatedBooking = new Booking();
         updatedBooking.setTotalprice(111);
 
+        // The server response code is 405, but in this case it's better to return 404.
         assertMethodNotAllowed(client.partialUpdateBookingJson(updatedBooking, -1, token));
     }
 

@@ -9,7 +9,7 @@ public class PropertyLoaderUtils {
     public static String loadProperty(String propertyName) {
         try (InputStream config = PropertyLoaderUtils.class.getClassLoader().getResourceAsStream("application.properties")) {
             if (config == null)
-                throw new ExceptionInInitializerError("ERROR: Property file for not found!");
+                throw new ExceptionInInitializerError("ERROR: Property file not found!");
 
             Properties appProps = new Properties();
             appProps.load(config);
